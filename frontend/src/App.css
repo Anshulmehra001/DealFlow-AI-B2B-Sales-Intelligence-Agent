@@ -1,0 +1,9 @@
+/* App-specific styles */
+.app-container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.dark .app-container {
+  background-color: #111827;
+}
