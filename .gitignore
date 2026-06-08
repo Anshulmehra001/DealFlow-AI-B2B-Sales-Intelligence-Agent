@@ -33,10 +33,11 @@ dist/
 dist-ssr/
 *.local
 
-# Environment
+# Environment - KEEP SECRETS OUT OF GITHUB!
 .env
 .env.local
 .env.*.local
+*.env
 
 # IDE
 .vscode/
@@ -75,3 +76,19 @@ temp/
 .Python
 pip-log.txt
 pip-delete-this-directory.txt
+
+# Hackathon Submission - Exclude large/unnecessary files
+backend/packages/*.whl
+backend/venv/
+frontend/node_modules/
+*.db
+*.sqlite
+*.sqlite3
+
+# Test files
+test_api.ps1.backup
+*.backup
+
+# OS specific
+Thumbs.db
+desktop.ini

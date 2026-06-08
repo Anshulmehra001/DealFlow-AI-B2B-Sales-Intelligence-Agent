@@ -1,0 +1,45 @@
+{
+  "name": "DealFlow AI MongoDB MCP Server",
+  "description": "MongoDB MCP Server configuration for DealFlow AI agents",
+  "version": "1.0.0",
+  "server": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "mongodb-mcp-server"
+    ],
+    "env": {
+      "MDB_MCP_CONNECTION_STRING": "${MONGODB_URI}",
+      "MDB_MCP_READ_ONLY": "false",
+      "MDB_MCP_LOG_PATH": "./logs"
+    }
+  },
+  "tools_enabled": [
+    "find",
+    "aggregate",
+    "count",
+    "list-databases",
+    "list-collections",
+    "collection-schema",
+    "insert-many",
+    "update-many",
+    "delete-many",
+    "create-collection",
+    "db-stats",
+    "explain"
+  ],
+  "collections": {
+    "leads": {
+      "description": "B2B sales leads",
+      "indexes": ["company_name", "email", "lead_score", "status"]
+    },
+    "deals": {
+      "description": "Sales pipeline deals",
+      "indexes": ["lead_id", "stage", "probability", "next_follow_up"]
+    },
+    "agent_actions": {
+      "description": "Audit log of agent actions",
+      "indexes": ["agent_type", "lead_id", "started_at"]
+    }
+  }
+}

@@ -12,9 +12,17 @@ from bson import ObjectId
 
 from backend.config import settings
 from backend.services.mongodb_service import mongodb_service
+
+# Import BOTH old agents (for backward compatibility) and new ADK agents
 from backend.agents.prospecting_agent import prospecting_agent
 from backend.agents.nurturing_agent import nurturing_agent
 from backend.agents.intelligence_agent import intelligence_agent
+
+# NEW: ADK-powered agents with MongoDB MCP (Required for hackathon)
+from backend.adk_agents.prospecting_adk_agent import prospecting_adk_agent
+from backend.adk_agents.nurturing_adk_agent import nurturing_adk_agent
+from backend.adk_agents.intelligence_adk_agent import intelligence_adk_agent
+
 from backend.models.lead import LeadCreate, LeadUpdate
 from backend.models.deal import DealCreate, DealUpdate
 
@@ -72,6 +80,9 @@ async def health_check():
         "version": settings.APP_VERSION,
         "gemini_enabled": settings.gemini_enabled,
         "email_enabled": settings.email_enabled,
+        "adk_agents": "enabled",  # NEW: Indicate ADK agents are active
+        "mongodb_mcp": "configured",  # NEW: MongoDB MCP Server
+        "hackathon": "Google Cloud Rapid Agent Hackathon 2026"
     }
 
 
@@ -334,6 +345,93 @@ async def list_agent_actions(limit: int = 50):
     try:
         actions = await mongodb_service.list_agent_actions(limit=limit)
         return {"actions": serialize(actions)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# NEW ADK AGENT ENDPOINTS (Google ADK + MongoDB MCP)
+# These endpoints use the new ADK-powered agents for the hackathon
+# ═══════════════════════════════════════════════════════════════════════════
+
+@app.post("/api/adk-agents/prospecting/process-lead/{lead_id}")
+async def adk_process_lead(lead_id: str):
+    """Process lead using ADK Prospecting Agent with MongoDB MCP"""
+    try:
+        # In production, MCP tools would be passed from ADK runtime
+        # For now, we pass None and handle it in the agent
+        result = await prospecting_adk_agent.process_lead(lead_id, mcp_tools=None)
+        return serialize(result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/adk-agents/nurturing/send-outreach/{lead_id}")
+async def adk_send_outreach(lead_id: str):
+    """Send outreach using ADK Nurturing Agent with MongoDB MCP"""
+    try:
+        result = await nurturing_adk_agent.send_initial_outreach(lead_id, mcp_tools=None)
+        return serialize(result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/adk-agents/nurturing/follow-up/{deal_id}")
+async def adk_send_follow_up(deal_id: str):
+    """Send follow-up using ADK Nurturing Agent with MongoDB MCP"""
+    try:
+        result = await nurturing_adk_agent.send_follow_up(deal_id, mcp_tools=None)
+        return serialize(result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/adk-agents/nurturing/check-follow-ups")
+async def adk_check_follow_ups():
+    """Check follow-ups using ADK Nurturing Agent"""
+    try:
+        result = await nurturing_adk_agent.check_follow_ups_needed(mcp_tools=None)
+        return serialize(result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/adk-agents/intelligence/predict/{deal_id}")
+async def adk_predict_deal(deal_id: str):
+    """Predict deal outcome using ADK Intelligence Agent"""
+    try:
+        result = await intelligence_adk_agent.predict_deal_outcome(deal_id, mcp_tools=None)
+        return serialize(result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/adk-agents/intelligence/at-risk-deals")
+async def adk_at_risk_deals():
+    """Identify at-risk deals using ADK Intelligence Agent"""
+    try:
+        result = await intelligence_adk_agent.identify_at_risk_deals(mcp_tools=None)
+        return serialize(result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/adk-agents/intelligence/pipeline-insights")
+async def adk_pipeline_insights():
+    """Generate pipeline insights using ADK Intelligence Agent"""
+    try:
+        result = await intelligence_adk_agent.generate_pipeline_insights(mcp_tools=None)
+        return serialize(result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/adk-agents/performance")
+async def adk_agent_performance():
+    """Get agent performance report using ADK Intelligence Agent"""
+    try:
+        result = await intelligence_adk_agent.get_agent_performance_report(mcp_tools=None)
+        return serialize(result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

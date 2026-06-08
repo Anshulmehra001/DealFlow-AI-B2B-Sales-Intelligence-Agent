@@ -1,0 +1,5 @@
+# Minimal requirements for demo
+fastapi
+uvicorn
+pydantic
+python-dotenv
