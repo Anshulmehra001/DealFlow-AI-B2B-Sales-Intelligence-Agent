@@ -14,7 +14,7 @@ import csv
 import io
 import logging
 from dotenv import load_dotenv
-import google.generativeai as genai
+from google import genai
 
 # Load environment
 load_dotenv()
@@ -27,14 +27,19 @@ logger = logging.getLogger(__name__)
 mongodb_client = None
 db = None
 
-# Gemini configuration
+# Gemini configuration - NEW SDK
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
+
 if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-    gemini_model = genai.GenerativeModel('gemini-pro')
-    logger.info("✅ Gemini AI configured")
+    try:
+        gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+        logger.info(f"✅ Gemini AI configured (model: {GEMINI_MODEL})")
+    except Exception as e:
+        gemini_client = None
+        logger.error(f"❌ Gemini setup failed: {e}")
 else:
-    gemini_model = None
+    gemini_client = None
     logger.warning("⚠️  Gemini API key not found")
 
 @asynccontextmanager
@@ -92,14 +97,17 @@ class Lead(BaseModel):
     website: Optional[str] = None
     phone: Optional[str] = None
 
-# Helper function to use Gemini AI
+# Helper function to use Gemini AI - NEW SDK
 async def call_gemini(prompt: str) -> str:
-    """Call Gemini AI for text generation"""
-    if not gemini_model:
+    """Call Gemini AI for text generation using NEW SDK"""
+    if not gemini_client:
         return "Gemini AI not configured"
     
     try:
-        response = gemini_model.generate_content(prompt)
+        response = gemini_client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt
+        )
         return response.text
     except Exception as e:
         logger.error(f"Gemini API error: {e}")
@@ -118,7 +126,8 @@ async def root():
 @app.get("/health")
 async def health():
     mongodb_status = "connected" if db is not None else "not configured"
-    gemini_status = "configured" if gemini_model else "not configured"
+    gemini_status = "configured" if gemini_client else "not configured"
+    gemini_model_name = GEMINI_MODEL if gemini_client else "none"
     
     stats = {
         "status": "healthy",
@@ -126,6 +135,7 @@ async def health():
         "version": "1.0.0",
         "mongodb": mongodb_status,
         "gemini_ai": gemini_status,
+        "gemini_model": gemini_model_name,
         "adk_agents": "enabled",
         "mongodb_mcp": "configured",
         "hackathon": "Google Cloud Rapid Agent Hackathon 2026"
