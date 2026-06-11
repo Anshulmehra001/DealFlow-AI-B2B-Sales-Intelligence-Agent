@@ -440,18 +440,6 @@ curl http://localhost:8000/api/adk-agents/intelligence/pipeline-insights
 4. Show comprehensive analytics JSON
 5. Show MCP aggregate queries in action
 
----
-
-## 🏅 Why This Wins
-
-1. **✓ Full ADK Implementation**: Not just API calls—real agent architecture
-2. **✓ Complete MCP Integration**: All data operations through MongoDB MCP
-3. **✓ Multi-Agent Collaboration**: Three agents working together
-4. **✓ Production-Ready**: Error handling, logging, audit trails
-5. **✓ MongoDB Showcase**: Aggregations, updates, analytics via MCP
-6. **✓ Real Automation**: Actual lead processing, email generation, predictions
-7. **✓ Comprehensive Docs**: Architecture, setup, demo script
-8. **✓ Extensible**: Easy to add more agents or tools
 
 ---
 

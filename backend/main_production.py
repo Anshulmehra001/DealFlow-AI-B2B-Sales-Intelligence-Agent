@@ -250,7 +250,7 @@ async def adk_process_lead(lead_id: str):
     score += 10  # Base score
     
     # Use Gemini AI for analysis
-    if gemini_model:
+    if gemini_client:
         prompt = f"""Analyze this B2B lead and provide insights:
         
 Company: {lead.get('company_name')}
@@ -309,7 +309,7 @@ async def adk_send_outreach(lead_id: str):
         raise HTTPException(status_code=404, detail="Lead not found")
     
     # Use Gemini AI to generate email
-    if gemini_model:
+    if gemini_client:
         prompt = f"""Write a professional B2B sales outreach email for:
 
 Company: {lead.get('company_name')}
@@ -392,7 +392,7 @@ async def adk_pipeline_insights():
     total_actions = await db.agent_actions.count_documents({})
     
     # Use Gemini for insights
-    if gemini_model:
+    if gemini_client:
         prompt = f"""Analyze this B2B sales pipeline and provide 3 key insights:
 
 Total Leads: {total_leads}

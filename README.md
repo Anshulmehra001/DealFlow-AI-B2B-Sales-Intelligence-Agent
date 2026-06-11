@@ -394,7 +394,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**Built with ❤️ for Google Cloud Rapid Agent Hackathon 2026**
+**Built for Google Cloud Rapid Agent Hackathon 2026**
 
 **Track**: MongoDB Partner Track  
 **Status**: Production-Ready ✅  
